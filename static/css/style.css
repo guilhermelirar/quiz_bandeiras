@@ -1,0 +1,136 @@
+:root {
+    --bg-color: #0f172a; 
+    --card-bg: #1e293b; 
+    --accent: #38bdf8; /* Mudei para um azul celeste/ciano que harmoniza melhor */
+    --text: #f8fafc; 
+    --button-hover: #0ea5e9;
+    --error: #fb7185;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text);
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#lobby, #jogo {
+    width: 100%;
+    max-width: 400px;
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: none;
+    background: #0f3460;
+    color: white;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--accent);
+    color: #1a1a2e;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.1s, background-color 0.2s;
+}
+
+button:hover {
+    background-color: var(--button-hover);
+    transform: translateY(-2px);
+}
+
+#placar {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.player-card {
+    background: rgba(255,255,255,0.05);
+    padding: 8px 12px;
+    border-radius: 5px;
+    border-bottom: 2px solid var(--accent);
+}
+
+#bandeira {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
+    border-radius: 8px;
+    margin: 20px 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+#opcoes button {
+    background-color: #0f3460;
+    color: white;
+    text-align: left;
+    padding-left: 20px;
+    border: 1px solid #16213e;
+}
+
+#opcoes button:hover {
+    background-color: #533483;
+}
+
+#ans {
+    color: var(--accent);
+    margin: 10px 0;
+    font-weight: bold;
+    min-height: 1.2em;
+}
+
+#btnpronto {
+    background-color: #e94560;
+    color: white;
+    margin-top: 20px;
+}
+
+/* Quando a opção for a correta */
+.btn-correct {
+    background-color: #4ecca3 !important; /* Verde */
+    color: #1a1a2e !important;
+}
+
+/* Cor para erro */
+.btn-incorrect { 
+    background-color: #fb7185 !important; 
+    color: white !important; 
+    opacity: 1 !important; 
+}
+
+/* Quando o player errar ou para as outras opções */
+.btn-fade {
+    opacity: 0.5;
+    pointer-events: none; /* Impede cliques extras */
+}
+
+/* Quando o botão de pronto for clicado */
+.btn-ready-active {
+    background-color: #4ecca3 !important;
+    color: #1a1a2e !important;
+}

@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teste Quiz</title>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body style="background: #222; color: white; text-align: center;">
+<body>
 
     <div id="lobby">
         <input type="text" id="username" placeholder="Seu nome">
@@ -15,107 +18,11 @@
     <div id="jogo" style="display:none">
         <h2 id="ans"></h2>
         <div id="placar"></div>
-        <img id="bandeira" src="" style="width: 200px; border: 2px solid #fff;">
+        <img id="bandeira" src="" alt="Bandeira">
         <div id="opcoes"></div>
         <button id="btnpronto" onclick="pronto()">Pronto</button>
     </div>
 
-    <script>
-        const socket = io();
-        let minha_room = "";
-        let meu_nome = "";
-        let ans = document.getElementById("ans");
-        let btnpronto = document.getElementById("btnpronto");
-        btnpronto.style.display = 'none';
-
-        function entrar() {
-            meu_nome = document.getElementById('username').value;
-            socket.emit('join_game', {username: meu_nome});
-        }
-
-        socket.on('waiting', (data) => {
-            document.getElementById('msg').innerText = data.msg;
-        });
-
-        socket.on('game_start', (room) => {
-            minha_room = room.id;
-            document.getElementById('lobby').style.display = 'none';
-            document.getElementById('jogo').style.display = 'block';
-            desenhar_round(room.round);
-            desenhar_placar(room.players);
-            ans.innerText = "";
-        });
-
-        socket.on('update_round', (placar) => {
-          desenhar_placar(placar);
-        });
-
-        socket.on('interval', (data) => {
-          desenhar_placar(data.placar);
-          ans.innerText = 'R: ' + data.answer;
-          btnpronto.style.display = 'block';
-          const opc = document.getElementById('opcoes');
-          opc.style.display = 'none';
-        });
-
-        let chosen = false;
-        socket.on('new_round', (room) => {
-          chosen = false;
-          desenhar_placar(room.players);
-          desenhar_round(room.round);
-          btnpronto.style.display = 'none';
-          ans.innerText = "";
-        });
-
-        function pronto() {
-          socket.emit('ready', {room_id: minha_room})
-          btnpronto.style.display = 'none';
-        }
-
-        function desenhar_placar(placar) {
-            const pldiv = document.getElementById("placar");
-            pldiv.innerHTML = ''; 
-
-            Object.values(placar).forEach(player => {
-              const playerElement = document.createElement("div");
-              playerElement.style.margin = "10px";
-              playerElement.style.padding = "5px";
-              playerElement.style.borderBottom = "1px solid #444";
-
-              let statusIcon = "";
-              if (player.status === "correct") {
-                  statusIcon = " ✅";
-              } else if (player.status === "incorrect") {
-                  statusIcon = " ❌";
-              } else {
-                  statusIcon = ""; 
-              }
-
-              playerElement.innerText = `${player.username}: ${player.score} pts${statusIcon}`;
-        
-              pldiv.appendChild(playerElement);
-            });
-        }        
-
-        function desenhar_round(round) {
-            document.getElementById('bandeira').src = 
-            `https://flagcdn.com/w320/${round.flag}.png`;
-            const div = document.getElementById('opcoes');
-            div.style.display = 'block';
-            div.innerHTML = '';
-            
-            // round.options é um dict {code: name}
-            for (const [code, name] of Object.entries(round.options)) {
-                let btn = document.createElement('button');
-                btn.innerText = name;
-                btn.onclick = () => {
-                    if (chosen) return;
-                    socket.emit('send_ans', {room_id: minha_room, answer: code});
-                    chosen = true;
-                };
-                div.appendChild(btn);
-            }
-        }
-    </script>
+    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
 </body>
 </html>
