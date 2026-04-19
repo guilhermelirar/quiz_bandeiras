@@ -1,17 +1,16 @@
 from flask import Flask, render_template, render_template_string, request
 from flask_socketio import SocketIO, emit, join_room
-import uuid
-import random
+import uuid, random, json
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-PAISES = {
-    "br": "Brasil", "us": "Estados Unidos", "fr": "França",
-    "jp": "Japão", "de": "Alemanha", "it": "Itália",
-    "ar": "Argentina", "ca": "Canadá", "mx": "México",
-    "pt": "Portugal", "gb": "Reino Unido", "au": "Austrália"
-}
+def carregar_paises():
+    with open('paises.json', 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+PAISES = carregar_paises()
+
 waiting_room = None
 rooms = {}
 
@@ -85,6 +84,30 @@ def handle_join(data):
         print(data, rooms[room_id])
         emit("waiting", {"msg": "Aguardando outro jogador..."})
 
+def goto_next_round(room):
+#    for player in room["players"]:
+#        room["players"][player]["status"] = "waiting"
+    
+    room["round"] = new_round()
+    room["round_c"] += 1
+    emit("new_round", room, to=room["id"])
+
+@socketio.on('ready')
+def handle_ready(data):
+    room = rooms[data["room_id"]]
+    room["players"][request.sid]["status"] = "waiting"
+    
+    if all((room["players"][p]["status"]=="waiting") 
+        for p in room["players"]):
+        goto_next_round(room)
+        return
+
+    emit('interval', {
+            "answer": PAISES[room["round"]["flag"]], 
+            "placar": room["players"]
+        }, to=data["room_id"])
+
+
 @socketio.on('send_ans')
 def handle_ans(data):
     room = rooms[data["room_id"]]
@@ -92,25 +115,27 @@ def handle_ans(data):
     sid = request.sid
 
     if ans == room["round"]["flag"]:
+        room["players"][sid]["status"] = "correct"
+        
         if room["round"]["onecorrect"]:
             room["players"][sid]["score"] += 3
-            room["round"] = new_round()
-            room["round_c"] += 1
-            emit("new_round", room, to=data["room_id"])
-            print(room, "fim do round passado")
-            return
-
-        room["round"]["onecorrect"] = True
-        room["players"][sid]["score"] += 5
-        room["players"][sid]["status"] = "correct"
-        emit("update_round", {
-                    "selected_correct":sid
-            }, to=data["room_id"])
-        print(data, room, "acertou")
+        else:
+            room["players"][sid]["score"] += 5
+            room["round"]["onecorrect"] = True
 
     else:
         room["players"][sid]["status"] = "incorrect"
-        emit("update_round", {
-                    "selected_incorrect":sid
-            }, to=data["room_id"])
-        print(data, room, "errou")
+
+       
+    if all((room["players"][p]["status"]!="waiting") 
+        for p in room["players"]):
+        emit('interval', {
+            "answer": PAISES[room["round"]["flag"]], 
+            "placar": room["players"]
+        }, to=data["room_id"])
+
+        return
+
+    emit("update_round", room["players"], to=data["room_id"])
+    
+
