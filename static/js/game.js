@@ -5,6 +5,7 @@ let ultima_escolha = "";
 let chosen = false;
 let ans = document.getElementById("ans");
 let btnpronto = document.getElementById("btnpronto");
+let round_c = document.getElementById("round_count")
 
 function entrar() {
     meu_nome = document.getElementById('username').value;
@@ -23,6 +24,7 @@ socket.on('game_start', (room) => {
     desenhar_round(room.round);
     desenhar_placar(room.players);
     ans.innerText = "";
+    round_c.innerText = room.round_c + "/213"
 });
 
 socket.on('update_round', (placar) => {
@@ -47,6 +49,7 @@ socket.on('new_round', (room) => {
     btnpronto.classList.remove('btn-ready-active', 'btn-fade');
     btnpronto.innerText = "Pronto";
     ans.innerText = "";
+    round_c.innerText = room.round_c + "/213"
 });
 
 function pronto() {

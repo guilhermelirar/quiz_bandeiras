@@ -23,19 +23,35 @@ def game():
     return render_template('index.html')
 
 def new_room(id):
+    deck = list(PAISES.keys())
+    print(len(PAISES))
+    random.shuffle(deck)
     return {
             "id": id,
             "players": {},
             "round_c": 0,
-            "round": {}
+            "round": {},
+            "deck": deck 
     }
 
-def new_round():
+def new_round(room):
+    room["round_c"] += 1
     global PAISES
+    
+    if not room["deck"]:
+        room["deck"] = list(PAISES.keys())
+        random.shuffle(room["deck"])
+    
+    ans = room["deck"].pop()
     N_OPTIONS = 4
-    options_sample = random.sample(list(PAISES.items()), k=N_OPTIONS)
+    # pega as demais opcoes sem repetir a antiga 
+    pool_erradas = [p for p in PAISES.items() if p[0] != ans]
+    options_sample = random.sample(pool_erradas, k=N_OPTIONS - 1)
+    options_sample.append((ans, PAISES[ans]))
+    
+    random.shuffle(options_sample)
     options = dict(options_sample)
-    ans = random.choice(options_sample)[0]
+    
     return {
         "options": options, 
         "flag": ans,
@@ -60,8 +76,7 @@ def handle_join(data):
                  "status": "waiting"
                  }
 
-
-        rooms[room_id]["round"] = new_round()
+        rooms[room_id]["round"] = new_round(rooms[room_id]) 
         join_room(room_id)
         print(data, rooms[room_id])
         emit("game_start", rooms[room_id], to=room_id)
@@ -85,11 +100,7 @@ def handle_join(data):
         emit("waiting", {"msg": "Aguardando outro jogador..."})
 
 def goto_next_round(room):
-#    for player in room["players"]:
-#        room["players"][player]["status"] = "waiting"
-    
-    room["round"] = new_round()
-    room["round_c"] += 1
+    room["round"] = new_round(room) 
     emit("new_round", room, to=room["id"])
 
 @socketio.on('ready')
