@@ -19,11 +19,4 @@ class Round:
     flag_id: str
     options: Options
 
-@dataclass 
-class Room:
-    id: str
-    players: list[Player]
-    rounc_c: int
-    round_ans: str 
-    round: Round
 
