@@ -8,15 +8,7 @@ class Player:
     status: str
 
 @dataclass
-class Options:
-    a: str
-    b: str
-    c: str
-    d: str
-
-@dataclass
 class Round:
     flag_id: str
-    options: Options
-
+    options: list[tuple[str, str]]
 
