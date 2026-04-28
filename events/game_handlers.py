@@ -17,7 +17,7 @@ def register_game_handlers(socketio: SocketIO, manager: GameManager):
             { 
                 "players": [asdict(p) for p in room.players.values()],
                 "flag": room.round.flag_id,
-                "options": asdict(room.round.options),
+                "options": room.round.options,
             },
              to=room.id)
 
