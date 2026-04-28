@@ -47,26 +47,21 @@ def register_game_handlers(socketio: SocketIO, manager: GameManager):
             new_round(room)
 
     @socketio.on('send_ans')
-    def handle_ans(data): 
+    def handle_ans(data):
         room = manager.get_room(data['room_id'])
         
         if room is None or room.round is None:
             return
 
-        ans = data['ans']
+        room.submit_answer(data['ans'], sid())
 
-        if room.round.ans == ans:
-            if all(p.status != "correct" for p in room.players.values()):
-                room.players[sid()].score += 5 
-            else:
-                room.players[sid()].score += 3
-            
-            room.players[sid()].status = "correct"
-
-        else:
-            room.players[sid()].status = "incorrect"
-
-
-        if all(p.status != "waiting" for p in room.players.values()):
-            # TODO intervalo 
+        if room.is_round_over():
+            emit('interval', 
+            { 
+                "players": [asdict(p) for p in room.players.values()],
+                "flag": room.round.flag_id,
+                "options": room.round.options
+            }, to=room.id) 
             pass
+    
+
