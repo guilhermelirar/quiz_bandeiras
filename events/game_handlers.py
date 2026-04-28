@@ -1,4 +1,4 @@
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room
 from logic.controller import GameManager, Room
 from flask import request
 from dataclasses import asdict
@@ -18,17 +18,20 @@ def register_game_handlers(socketio: SocketIO, manager: GameManager):
                 "players": [asdict(p) for p in room.players.values()],
                 "flag": room.round.flag_id,
                 "options": asdict(room.round.options),
-            })
+            },
+             to=room.id)
 
 
     @socketio.on('join_1v1')
     def handle_join_1v1(data):
         room: Room = manager.join_1v1(data['username'], sid())
-        
+        join_room(room.id)
+
         if len(room.players) == 2:
             return new_round(room)
-        
-        emit('waiting_players', {'message': "Aguardando novos jogadores"})
+         
+        emit('waiting_players', {'message': "Aguardando novos jogadores"},
+             to=room.id)
         
 
     @socketio.on('ready')
