@@ -3,9 +3,9 @@ from models import *
 from uuid import uuid4
 
 class Room:
-    def __init__(self, players: dict[str, Player]) -> None:
+    def __init__(self, players: list[Player]) -> None:
         self.id = str(uuid4())
-        self.players: dict[str, Player] = players
+        self.players: dict[str, Player] = {player.sid: player for player in players}
         self.deck = {}
         self.round: Round | None
         
@@ -37,6 +37,7 @@ class GameManager:
             self.rooms[room.id] = room
             return room
 
-        return self.new_room([self.new_player(username, sid)]) 
-
+        room =  self.new_room([self.new_player(username, sid)]) 
+        self.public_waiting_room = room
+        return room
 
