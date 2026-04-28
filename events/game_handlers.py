@@ -25,9 +25,11 @@ def register_game_handlers(socketio: SocketIO, manager: GameManager):
     def handle_join_1v1(data):
         room: Room = manager.join_1v1(data['username'], sid())
         
-        if room is not None and len(room.players) == 2:
-            new_round(room)
-
+        if len(room.players) == 2:
+            return new_round(room)
+        
+        emit('waiting_players', {'message': "Aguardando novos jogadores"})
+        
 
     @socketio.on('ready')
     def handle_ready(data):
