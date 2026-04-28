@@ -55,7 +55,7 @@ class Room:
             self.players[sid].status = "incorrect"
 
 
-    def is_round_over(self):
+    def is_round_over(self) -> bool:
         return all(p.status != "waiting" for p in self.players.values())
 
 
