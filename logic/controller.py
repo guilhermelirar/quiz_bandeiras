@@ -1,7 +1,5 @@
-from _typeshed import OptExcInfo
 import random as rd
-from app import new_room
-from models import *
+from logic.models import *
 from uuid import uuid4
 
 class Room:
@@ -32,7 +30,10 @@ class Room:
         # garantindo que a resposta não esteja dentro das outras alternativas
         while options_list is None or ans in options_list:
             options_list = rd.sample(self.countries, k=3)
-       
+      
+        for p in self.players.values():
+            p.status = "waiting"
+
         # garantindo que a resposta não será sempre a última alternativa 
         options_list.append(ans)
         rd.shuffle(options_list) 
@@ -88,3 +89,7 @@ class GameManager:
         self.public_waiting_room = room
         return room
 
+    def join_solo(self, username: str, sid: str):
+        room = self.new_room([self.new_player(username, sid)])
+        self.rooms[room.id] = room
+        return room

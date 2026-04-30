@@ -14,10 +14,12 @@ def register_game_handlers(socketio: SocketIO, manager: GameManager):
             return
         
         emit('new_round', 
-            { 
+            {
+                "id": room.id,
                 "players": [asdict(p) for p in room.players.values()],
                 "flag": room.round.flag_id,
                 "options": room.round.options,
+                "round_c": room.round_c
             },
              to=room.id)
 
@@ -29,10 +31,17 @@ def register_game_handlers(socketio: SocketIO, manager: GameManager):
 
         if len(room.players) == 2:
             return new_round(room)
-         
-        emit('waiting_players', {'message': "Aguardando novos jogadores"},
-             to=room.id)
         
+        emit('waiting_players', 
+             {'message': "Aguardando jogador"},
+             to=room.id)
+    
+    @socketio.on('join_solo')
+    def handle_join_solo(data):
+        room: Room = manager.join_solo(data['username'], sid())
+        join_room(room.id)
+        return new_round(room)
+
 
     @socketio.on('ready')
     def handle_ready(data):
@@ -63,5 +72,10 @@ def register_game_handlers(socketio: SocketIO, manager: GameManager):
                 "options": room.round.options
             }, to=room.id) 
             pass
-    
 
+        emit('update_round', 
+             {'players': [asdict(p) for p in room.players.values()]}, 
+             to=room.id)
+
+
+    return handle_ans, handle_join_1v1, handle_ready, handle_join_solo

@@ -11,20 +11,23 @@
 
     <div id="lobby">
         <input type="text" id="username" placeholder="Seu nome">
-        <button onclick="entrar()">Entrar no Jogo</button>
+        <button id="btn-1v1">Jogar 1v1</button>
+        <button id="btn-solo">Jogar solo</button>
         <p id="msg"></p>
     </div>
 
     <div id="jogo" style="display:none">
-        <h1 id=title>Quiz De Bandeiras</h1>
+        <h1 id="title">Quiz De Bandeiras</h1>
         <h2 id="ans"></h2>
         <h3 id="round_count">""</h3>
         <div id="placar"></div>
         <img id="bandeira" src="" alt="Bandeira">
         <div id="opcoes"></div>
-        <button id="btnpronto" onclick="pronto()">Pronto</button>
+        <button id="btnpronto" style="display:none">Pronto</button>
     </div>
 
-    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
