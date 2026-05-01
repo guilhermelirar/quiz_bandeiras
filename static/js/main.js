@@ -1,5 +1,5 @@
 const State = {
-    room_id: "",
+room_id: "",
     chosen: false,
     ultima_escolha: ""
 };
